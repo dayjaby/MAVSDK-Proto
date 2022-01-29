@@ -16,9 +16,27 @@ service CameraServerService {
 
     // Subscribe to single-image capture commands
     rpc SubscribeTakePhoto(SubscribeTakePhotoRequest) returns(stream TakePhotoResponse) { option (mavsdk.options.async_type) = ASYNC; }
+
+    // Subscribe to camera mode commands
+    rpc SubscribeSetCameraModeImage(SubscribeSetCameraModeImageRequest) returns(stream SetCameraModeImageResponse) {
+        option (mavsdk.options.async_type) = ASYNC;
+    }
+    rpc SubscribeSetCameraModeVideo(SubscribeSetCameraModeVideoRequest) returns(stream SetCameraModeVideoResponse) {
+        option (mavsdk.options.async_type) = ASYNC;
+    }
+    rpc SubscribeSetCameraModeSurvey(SubscribeSetCameraModeSurveyRequest) returns(stream SetCameraModeSurveyResponse) {
+        option (mavsdk.options.async_type) = ASYNC;
+    }
     
     // Adds a photo to the list of available photos
     rpc PublishPhoto(PublishPhotoRequest) returns(PublishPhotoResponse) { option (mavsdk.options.async_type) = SYNC; }
+}
+
+enum CameraMode {
+    CAMERA_MODE_UNKNOWN = 0;
+    CAMERA_MODE_IMAGE = 1;
+    CAMERA_MODE_VIDEO = 2;
+    CAMERA_MODE_SURVEY = 3;
 }
 
 message SetInformationRequest {
@@ -37,11 +55,34 @@ message SetInProgressResponse {
     CameraServerResult camera_server_result = 1;
 }
 
-message SubscribeTakePhotoRequest {}
+message SubscribeTakePhotoRequest {
+    bool can_capture_in_video_mode = 1;
+}
 
 message TakePhotoResponse {
     CameraServerResult camera_server_result = 1;
     int32 index = 2;
+}
+
+message SubscribeSetCameraModeImageRequest {}
+
+message SetCameraModeImageResponse {
+    CameraServerResult camera_server_result = 1;
+    CameraMode mode = 2;
+}
+
+message SubscribeSetCameraModeVideoRequest {}
+
+message SetCameraModeVideoResponse {
+    CameraServerResult camera_server_result = 1;
+    CameraMode mode = 2;
+}
+
+message SubscribeSetCameraModeSurveyRequest {}
+
+message SetCameraModeSurveyResponse {
+    CameraServerResult camera_server_result = 1;
+    CameraMode mode = 2;
 }
 
 message PublishPhotoRequest {
@@ -56,11 +97,15 @@ message PublishPhotoResponse {
 message Information {
     string vendor_name = 1; // Name of the camera vendor
     string model_name = 2; // Name of the camera model
-    float focal_length_mm = 3; // Focal length
-    float horizontal_sensor_size_mm = 4; // Horizontal sensor size
-    float vertical_sensor_size_mm = 5; // Vertical sensor size
-    uint32 horizontal_resolution_px = 6; // Horizontal image resolution in pixels
-    uint32 vertical_resolution_px = 7; // Vertical image resolution in pixels
+    uint32 firmware_version = 3; // Version of the camera firmware
+    float focal_length_mm = 4; // Focal length
+    float sensor_size_h_mm = 5; // Horizontal sensor size
+    float sensor_size_v_mm = 6; // Vertical sensor size
+    uint32 resolution_h_px = 7; // Horizontal image resolution in pixels
+    uint32 resolution_v_px = 8; // Vertical image resolution in pixels
+    uint32 lens_id = 9; // Lens ID
+    uint32 cam_definition_version = 10; // Camera definition version (iteration)
+    string cam_definition_uri = 11; // Camera definition URI (http or mavlink ftp)
 }
 
 // Position type in global coordinates.
