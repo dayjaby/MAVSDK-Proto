@@ -27,6 +27,16 @@ service CameraServerService {
     rpc SubscribeSetCameraModeSurvey(SubscribeSetCameraModeSurveyRequest) returns(stream SetCameraModeSurveyResponse) {
         option (mavsdk.options.async_type) = ASYNC;
     }
+
+    // Subscribe to camera zoom commands
+    rpc SubscribeSetCameraZoom(SubscribeSetCameraZoomRequest) returns(stream SetCameraZoomResponse) {
+        option (mavsdk.options.async_type) = ASYNC;
+    }
+
+    // Subscribe to camera focus commands
+    rpc SubscribeSetCameraFocus(SubscribeSetCameraFocusRequest) returns(stream SetCameraFocusResponse) {
+        option (mavsdk.options.async_type) = ASYNC;
+    }
     
     // Adds a photo to the list of available photos
     rpc PublishPhoto(PublishPhotoRequest) returns(PublishPhotoResponse) { option (mavsdk.options.async_type) = SYNC; }
@@ -37,6 +47,21 @@ enum CameraMode {
     CAMERA_MODE_IMAGE = 1;
     CAMERA_MODE_VIDEO = 2;
     CAMERA_MODE_SURVEY = 3;
+}
+
+enum CameraFocusStepDirection {
+    CAMERA_FOCUS_STEP_DIRECTION_IN = 0;
+    CAMERA_FOCUS_STEP_DIRECTION_OUT = 1;
+}
+
+enum CameraFocusType {
+    CAMERA_FOCUS_TYPE_STEP = 0;
+    CAMERA_FOCUS_TYPE_CONTINUOUS = 1;
+    CAMERA_FOCUS_TYPE_RANGE = 2;
+    CAMERA_FOCUS_TYPE_METERS = 3;
+    CAMERA_FOCUS_TYPE_AUTO = 4;
+    CAMERA_FOCUS_TYPE_AUTO_SINGLE = 5;
+    CAMERA_FOCUS_TYPE_AUTO_CONTINUOUS = 6;
 }
 
 message SetInformationRequest {
@@ -83,6 +108,39 @@ message SubscribeSetCameraModeSurveyRequest {}
 message SetCameraModeSurveyResponse {
     CameraServerResult camera_server_result = 1;
     CameraMode mode = 2;
+}
+
+message SubscribeSetCameraZoomRequest {
+    float focal_length_min = 1;
+    float focal_length_max = 2;
+}
+
+message CameraZoomFocalLength {
+    float normalized = 1;
+    float length = 2;
+}
+
+message SetCameraZoomResponse {
+    CameraServerResult camera_server_result = 1;
+    CameraZoomFocalLength focal = 2;
+}
+
+message SubscribeSetCameraFocusRequest {}
+
+message CameraFocus {
+
+    CameraFocusType type = 1;
+    oneof value {
+        CameraFocusStepDirection step_direction = 2;
+        float continuous = 3;
+        float normalized = 4;
+        float meters = 5;
+    }
+}
+
+message SetCameraFocusResponse {
+    CameraServerResult camera_server_result = 1;
+    CameraFocus focus = 2;
 }
 
 message PublishPhotoRequest {
