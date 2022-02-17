@@ -14,6 +14,10 @@ service CameraServerService {
     // Sets the camera capture status
     rpc SetInProgress(SetInProgressRequest) returns(SetInProgressResponse) { option (mavsdk.options.async_type) = SYNC; }
 
+    // Subscribe to parameter changes
+    rpc SubscribeParamInt(ProvideParamIntRequest) returns(stream ProvideParamIntResponse) { option (mavsdk.options.async_type) = ASYNC; }
+    rpc SubscribeParamFloat(ProvideParamFloatRequest) returns(stream ProvideParamFloatResponse) { option (mavsdk.options.async_type) = ASYNC; }
+
     // Subscribe to single-image capture commands
     rpc SubscribeTakePhoto(SubscribeTakePhotoRequest) returns(stream TakePhotoResponse) { option (mavsdk.options.async_type) = ASYNC; }
 
@@ -78,6 +82,26 @@ message SetInProgressRequest {
 
 message SetInProgressResponse {
     CameraServerResult camera_server_result = 1;
+}
+
+message ProvideParamIntRequest {
+    string name = 1; // Name of the parameter to provide
+    int32 value = 2; // Value the parameter should be set to
+}
+
+message ProvideParamIntResponse {
+    CameraServerResult camera_server_result = 1;
+    int32 new_value = 2;
+}
+
+message ProvideParamFloatRequest {
+    string name = 1; // Name of the parameter to provide
+    float value = 2; // Value the parameter should be set to
+}
+
+message ProvideParamFloatResponse {
+    CameraServerResult camera_server_result = 1;
+    float new_value = 2;
 }
 
 message SubscribeTakePhotoRequest {
